@@ -1,1 +1,1 @@
-import {photoDescriptionsArray} from './data';
+import './thumbnail.js';
