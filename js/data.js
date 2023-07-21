@@ -97,6 +97,6 @@ function createComment(generateUserId){
   };
 }
 
-const photoDescriptionsArray = () => Array.from({length: PHOTO_COUNT},createPhotoDescription);
+const createPhotoDescriptionsArray = () => Array.from({length: PHOTO_COUNT},createPhotoDescription);
 
-export {photoDescriptionsArray};
+export {createPhotoDescriptionsArray};

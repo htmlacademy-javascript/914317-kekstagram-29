@@ -48,3 +48,8 @@ function returnDate(dateString) {
   const dateArray = dateString.split(':');
   return new Date(1, 1, 1, parseInt(dateArray[0], 10), parseInt(dateArray[1], 10), 0);
 }
+
+checkStringLength('kek',9);
+isPalindrome('kek');
+returnNumber('kek');
+isMeetingWithinWorkingDay('9:00','18:00','14:30',65);
