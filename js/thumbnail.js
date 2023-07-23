@@ -17,3 +17,5 @@ photoDescriptionsArray.forEach((photoDesc) => {
 });
 
 pictureSection.appendChild(docFragment);
+
+export { photoDescriptionsArray };
