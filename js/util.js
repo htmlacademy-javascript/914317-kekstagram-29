@@ -27,4 +27,16 @@ function createId(min, max) {
   };
 }
 
-export {createId};
+const isEscKey = (evt) => evt.key === 'Escape';
+
+function closePopup(element,body){
+  element.classList.add('hidden');
+  body.classList.remove('modal-open');
+}
+
+function openPopup(element,body){
+  element.classList.remove('hidden');
+  body.classList.add('modal-open');
+}
+
+export {createId, isEscKey, closePopup, openPopup};
