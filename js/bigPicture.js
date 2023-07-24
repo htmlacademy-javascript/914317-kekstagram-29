@@ -1,4 +1,5 @@
 import { photoDescriptionsArray } from './thumbnail.js';
+import { isEscKey, closePopup, openPopup } from './util.js';
 
 const pictures = document.querySelectorAll('.picture');
 
@@ -16,13 +17,12 @@ const bigPictureCancel = bigPicture.querySelector('.big-picture__cancel');
 
 const body = document.querySelector('body');
 
-
 const docFragment = document.createDocumentFragment();
 
 
 function addThumbnailClick(picture, photoDesc) {
   picture.addEventListener('click', () => {
-    bigPicture.classList.remove('hidden');
+    openPopup(bigPicture,body);
     bigPictureImg.firstElementChild.src = photoDesc.url;
     likesCount.textContent = photoDesc.likes;
     commentsCount.textContent = photoDesc.comments.length;
@@ -44,20 +44,17 @@ function addThumbnailClick(picture, photoDesc) {
     socialComments.appendChild(docFragment);
     socialCommentCount.classList.add('hidden');
     commentsLoader.classList.add('hidden');
-    body.classList.add('modal-open');
   });
 }
 
 document.addEventListener('keydown', (evt) =>{
-  if (evt.key === 'Escape') {
-    bigPicture.classList.add('hidden');
-    body.classList.remove('modal-open');
+  if (isEscKey(evt)) {
+    closePopup(bigPicture,body);
   }
 });
 
 bigPictureCancel.addEventListener('click', () =>{
-  bigPicture.classList.add('hidden');
-  body.classList.remove('modal-open');
+  closePopup(bigPicture,body);
 });
 
 for (let i = 0; i < pictures.length; i++) {
