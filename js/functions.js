@@ -36,11 +36,7 @@ function isMeetingWithinWorkingDay(workDayStart, workDayEnd, meetingStart, meeti
   const meetingEnd = returnDate(meetingStart);
   meetingEnd.setMinutes(meetingEnd.getMinutes() + meetingDuration);
 
-  if (meetingStartDate >= workStartDate && workEndDate >= meetingEnd) {
-    return true;
-  } else {
-    return false;
-  }
+  return meetingStartDate >= workStartDate && workEndDate >= meetingEnd;
 
 }
 
@@ -51,5 +47,6 @@ function returnDate(dateString) {
 
 checkStringLength('kek',9);
 isPalindrome('kek');
-returnNumber('kek');
 isMeetingWithinWorkingDay('9:00','18:00','14:30',65);
+
+export { returnNumber, checkStringLength };
