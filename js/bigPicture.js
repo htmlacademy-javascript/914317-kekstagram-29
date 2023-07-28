@@ -4,14 +4,16 @@ import { isEscKey, closePopup, openPopup } from './util.js';
 const pictures = document.querySelectorAll('.picture');
 
 const bigPicture = document.querySelector('.big-picture');
+const bigPicturePreview = bigPicture.querySelector('.big-picture_preview');
 
-const bigPictureImg = bigPicture.querySelector('.big-picture__img');
 const likesCount = bigPicture.querySelector('.likes-count');
 const commentsCount = bigPicture.querySelector('.comments-count');
+
 const socialCaption = bigPicture.querySelector('.social__caption');
 const socialComments = bigPicture.querySelector('.social__comments');
 const socialComment = bigPicture.querySelector('.social__comment');
 const socialCommentCount = bigPicture.querySelector('.social__comment-count');
+
 const commentsLoader = bigPicture.querySelector('.comments-loader');
 const bigPictureCancel = bigPicture.querySelector('.big-picture__cancel');
 
@@ -23,7 +25,7 @@ const docFragment = document.createDocumentFragment();
 function addThumbnailClick(picture, photoDesc) {
   picture.addEventListener('click', () => {
     openPopup(bigPicture,body);
-    bigPictureImg.firstElementChild.src = photoDesc.url;
+    bigPicturePreview.src = photoDesc.url;
     likesCount.textContent = photoDesc.likes;
     commentsCount.textContent = photoDesc.comments.length;
     socialCaption.textContent = photoDesc.description;
