@@ -1,7 +1,5 @@
-import { photoDescriptionsArray } from './thumbnail.js';
-import { isEscKey, closePopup, openPopup } from './util.js';
 
-const pictures = document.querySelectorAll('.picture');
+import { openCloseThumbnailPopup} from './buttons.js';
 
 const bigPicture = document.querySelector('.big-picture');
 const bigPicturePreview = bigPicture.querySelector('.big-picture_preview');
@@ -11,27 +9,40 @@ const commentsCount = bigPicture.querySelector('.comments-count');
 
 const socialCaption = bigPicture.querySelector('.social__caption');
 const socialComments = bigPicture.querySelector('.social__comments');
-const socialComment = bigPicture.querySelector('.social__comment');
+const socialComment = bigPicture.querySelectorAll('.social__comment');
 const socialCommentCount = bigPicture.querySelector('.social__comment-count');
-
 const commentsLoader = bigPicture.querySelector('.comments-loader');
+
 const bigPictureCancel = bigPicture.querySelector('.big-picture__cancel');
 
-const body = document.querySelector('body');
 
 const docFragment = document.createDocumentFragment();
 
+//событие: добавить клик для открытия миниатюр
+function addClickOnThumbnail(picturesArray) {
 
-function addThumbnailClick(picture, photoDesc) {
+  const pictures = document.querySelectorAll('.picture');
+
+  for (let i = 0; i < pictures.length; i++) {
+    showBigPicture(pictures[i], picturesArray[i]);
+  }
+}
+
+//событие: открытие миниатюры
+function showBigPicture(picture, photoDesc) {
   picture.addEventListener('click', () => {
-    openPopup(bigPicture,body);
+
+    openCloseThumbnailPopup();
+
     bigPicturePreview.src = photoDesc.url;
     likesCount.textContent = photoDesc.likes;
     commentsCount.textContent = photoDesc.comments.length;
     socialCaption.textContent = photoDesc.description;
 
     photoDesc.comments.forEach((comment) => {
-      const commentElement = socialComment.cloneNode(true);
+      const firstDomComment = socialComment[0];
+
+      const commentElement = firstDomComment.cloneNode(true);
 
       const socialPicture = commentElement.querySelector('.social__picture');
       const socialText = commentElement.querySelector('.social__text');
@@ -42,24 +53,19 @@ function addThumbnailClick(picture, photoDesc) {
       socialText.textContent = comment.message;
 
       docFragment.appendChild(commentElement);
+
     });
+
     socialComments.appendChild(docFragment);
     socialCommentCount.classList.add('hidden');
     commentsLoader.classList.add('hidden');
+
   });
 }
 
-document.addEventListener('keydown', (evt) =>{
-  if (isEscKey(evt)) {
-    closePopup(bigPicture,body);
-  }
+bigPictureCancel.addEventListener('click', () => {
+  openCloseThumbnailPopup();
 });
 
-bigPictureCancel.addEventListener('click', () =>{
-  closePopup(bigPicture,body);
-});
-
-for (let i = 0; i < pictures.length; i++) {
-  addThumbnailClick(pictures[i], photoDescriptionsArray[i]);
-}
+export { addClickOnThumbnail };
 

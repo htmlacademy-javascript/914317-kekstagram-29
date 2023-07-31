@@ -1,5 +1,7 @@
-import { isEscKey, closePopup } from './util.js';
-import { returnNumber, checkStringLength } from './functions.js';
+import { returnNumber } from './functions.js';
+import { pristine } from './validation.js';
+import { showCloseUploadPopup } from './buttons.js';
+import { showErrorSection, showSuccessSection } from './templates.js';
 
 const MAX_SCALE_VALUE = 100;
 const MIN_SCALE_VALUE = 25;
@@ -13,14 +15,16 @@ const EFFECTS_OPTIONS = {
   'none': 'none',
 };
 
-const VALIDATING_MESSAGE = {
-  hashInvalid: 'Хэш-тэги невалидны',
-  hashCountInvalid: 'Превышено количество хэш-тегов',
-  hashRepeat: 'Хэш-теги повторяются',
-  incorrectCommentLength: 'В комментарии больше 140 символов',
-};
 
 const SLIDER_STYLE_OPTIONS = {
+  none: {
+    range: {
+      min: 0,
+      max: 1,
+    },
+    start: 1,
+    step: 0.1,
+  },
   chrome: {
     range: {
       min: 0,
@@ -63,17 +67,13 @@ const SLIDER_STYLE_OPTIONS = {
   }
 };
 
-const body = document.querySelector('body');
-const form = document.querySelector('.img-upload__form');
+const imgUpload = document.querySelector('.img-upload');
+const form = imgUpload.querySelector('.img-upload__form');
 
 const imgUploadInput = form.querySelector('.img-upload__input');
-const imgUploadOverlay = form.querySelector('.img-upload__overlay');
 const imgUploadCancel = form.querySelector('.img-upload__cancel');
 const imgUploadPreview = form.querySelector('.img-upload__preview');
 const imgPreview = imgUploadPreview.querySelector('.image_preview');
-
-const textarea = form.querySelector('textarea[name="description"]');
-const hashInput = form.querySelector('input[name="hashtags"]');
 
 const scaleControlSmaller = form.querySelector('.scale__control--smaller');
 const scaleControlBigger = form.querySelector('.scale__control--bigger');
@@ -85,25 +85,39 @@ const effectLevelContainer = form.querySelector('.img-upload__effect-level');
 
 let currentEffect;
 
-const uploadDescriptionValidation = {
-  isValid: true,
-  validMessage: '',
+//отправка формы
+const formSubmit = (onSuccess) => {
+
+  form.addEventListener('submit', (evt) => {
+
+    evt.preventDefault();
+    const isValid = pristine.validate();
+    if (isValid) {
+      const formData = new FormData(evt.target);
+      fetch('https://29.javascript.pages.academy/kekstagram',
+        {
+          //method: 'POST',
+          body: formData,
+        }
+
+      ).then((response) =>{
+        if (response.ok){
+          onSuccess();
+          showSuccessSection();
+          resetForm();
+        } else{
+          showErrorSection();
+        }
+      })
+        .catch(() => showErrorSection());
+    }
+  });
 };
 
-const uploadHashtagValidation = {
-  isValid: true,
-  validMessage: '',
-};
 
-noUiSlider.create(effectLevelSlider, {
-  range: {
-    min: 0,
-    max: 1,
-  },
-  start: 1,
-  step: 0.1,
-});
+noUiSlider.create(effectLevelSlider, SLIDER_STYLE_OPTIONS['none']);
 
+//показать-скрыть слайдер и его контейнер
 function showHideEffectLevelContainer(hide) {
   if (hide) {
     effectLevelSlider.classList.add('hidden');
@@ -115,6 +129,7 @@ function showHideEffectLevelContainer(hide) {
   }
 }
 
+//#смена фильтра
 function onEffectChange(evt) {
   if (evt.target.matches('input[type="radio"]')) {
     if (evt.target.checked) {
@@ -133,8 +148,10 @@ function onEffectChange(evt) {
   }
 }
 
-form.addEventListener('change', onEffectChange,);
+//событие: #смена фильтра
+form.addEventListener('change', onEffectChange);
 
+//смена насыщенности эффекта при изменении позиции слайдера
 effectLevelSlider.noUiSlider.on('update', () => {
 
   effectLevelValue.value = effectLevelSlider.noUiSlider.get();
@@ -151,14 +168,16 @@ effectLevelSlider.noUiSlider.on('update', () => {
   }
 });
 
-function showUploadForm() {
-  imgUploadOverlay.classList.remove('hidden');
-  body.classList.add('modal-open');
-}
+//показать форму редактирования изображения
+imgUploadInput.addEventListener('change', showCloseUploadPopup);
 
+//событие: закрытие формы редактирования изображения по "крестику"
+imgUploadCancel.addEventListener('click', () => {
+  showCloseUploadPopup();
+  resetForm();
+});
 
-imgUploadInput.addEventListener('change', showUploadForm);
-
+//увеличение изображения
 scaleControlSmaller.addEventListener('click', () => {
   let currValue = returnNumber(inputScale.value);
 
@@ -171,6 +190,7 @@ scaleControlSmaller.addEventListener('click', () => {
   imgPreview.style.transform = `scale(${scaleTransform})`;
 });
 
+//уменьшение изображения
 scaleControlBigger.addEventListener('click', () => {
   let currValue = returnNumber(inputScale.value);
 
@@ -183,113 +203,17 @@ scaleControlBigger.addEventListener('click', () => {
   imgPreview.style.transform = `scale(${scaleTransform})`;
 });
 
-imgUploadCancel.addEventListener('click', () => {
-  closePopup(imgUploadOverlay, body);
-  resetForm();
-});
-
-//------------------------------------------------------------------
-const pristine = new Pristine(form, {
-  classTo: 'img-upload__text',
-  errorClass: 'img-upload__text--invalid',
-  successClass: 'img-upload__text--valid',
-  errorTextParent: 'img-upload__text',
-  errorTextTag: 'p',
-  errorTextClass: 'img-upload__error'
-});
-
-function validateUploadtext() {
-  iSValidDescription(textarea.value);
-  iSValidHashtag(hashInput.value);
-
-  if (uploadDescriptionValidation.isValid === true && uploadHashtagValidation.isValid === true){
-    return true;
-  } else {
-    return false;
-  }
-}
-
-function getValidateMessage() {
-
-  let errorString = '';
-  if (uploadDescriptionValidation.isValid === false){
-    errorString = uploadDescriptionValidation.validMessage;
-  }
-
-  if (uploadHashtagValidation.isValid === false){
-    if(errorString === ''){
-      errorString = uploadHashtagValidation.validMessage;
-    } else {
-      errorString = `${errorString} или ${uploadHashtagValidation.validMessage}`;
-    }
-  }
-  return errorString;
-
-}
-
-function iSValidDescription(value) {
-  const isOk = checkStringLength(value, 10);
-  uploadDescriptionValidation.isValid = isOk;
-  uploadDescriptionValidation.validMessage = isOk === true ? '' : VALIDATING_MESSAGE['incorrectCommentLength'];
-
-}
-
-
-function iSValidHashtag(value) {
-  const stringArray = value.split(' ');
-
-  if (stringArray.length === 1 && stringArray[0] === '') {
-
-    uploadHashtagValidation.isValid = true;
-
-  } else if (stringArray.length > 5 || findDuplicateValue(stringArray)) {
-
-    uploadHashtagValidation.isValid = false;
-    uploadHashtagValidation.validMessage = `${VALIDATING_MESSAGE['hashCountInvalid']} или ${VALIDATING_MESSAGE['hashRepeat']}`;
-
-  } else {
-
-    const hashTemplate = /^#[a-zа-яё0-9]{1,19}$/i;
-    let isOk;
-
-    for (let i = 0; i < stringArray.length; i++) {
-      isOk = hashTemplate.test(stringArray[i]);
-      if (!isOk) {
-        break;
-      }
-    }
-    uploadHashtagValidation.isValid = isOk;
-    uploadHashtagValidation.validMessage = isOk === true ? '' : VALIDATING_MESSAGE['hashInvalid'];
-
-  }
-}
-
-
-function findDuplicateValue(array) {
-  const findDuplicates = () => array.filter((item, index) => array.indexOf(item) !== index);
-  const duplicates = findDuplicates(array);
-  return duplicates.length > 0;
-}
-
-pristine.addValidator(hashInput, validateUploadtext, getValidateMessage);
-pristine.addValidator(textarea, validateUploadtext, getValidateMessage);
-
-form.addEventListener('submit', (evt) => {
-  if (!pristine.validate()) {
-    evt.preventDefault();
-  }
-});
-
-//-----------------------------------------------------
-
+//сбросить форму к изначальному состоянию
 function resetForm() {
+
+  effectLevelSlider.noUiSlider.updateOptions(SLIDER_STYLE_OPTIONS['none']);
+  imgPreview.style.removeProperty('filter');
+  effectLevelValue.value = 0;
+  showHideEffectLevelContainer(true);
+
   form.reset();
   pristine.validate();
+
 }
 
-document.addEventListener('keydown', (evt) => {
-  if (isEscKey(evt) && document.activeElement !== textarea) {
-    closePopup(imgUploadOverlay, body);
-    resetForm();
-  }
-});
+export { formSubmit, resetForm };
