@@ -96,7 +96,7 @@ const formSubmit = (onSuccess) => {
       const formData = new FormData(evt.target);
       fetch('https://29.javascript.pages.academy/kekstagram',
         {
-          //method: 'POST',
+          method: 'POST',
           body: formData,
         }
 
