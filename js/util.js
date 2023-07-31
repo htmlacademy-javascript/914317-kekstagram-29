@@ -3,6 +3,8 @@ const ALERT_SHOW_TIME = 5000;
 
 const isEscKey = (evt) => evt.key === 'Escape';
 
+const randomBoolean = () => Math.random() < 0.5;
+
 const showAlert = (message) => {
 
   const alertContainer = document.createElement('div');
@@ -72,9 +74,19 @@ function removeChildElements(parentElement, className = '', fullName = '') {
 
 }
 
+const debounce = (callback, timeoutDelay) => {
+  let timeoutId;
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
+  };
+};
+
 export {
   createId
   , isEscKey
   , showAlert
   , removeChildElements
+  , randomBoolean
+  , debounce
 };

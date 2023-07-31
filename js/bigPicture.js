@@ -15,18 +15,7 @@ const commentsLoader = bigPicture.querySelector('.comments-loader');
 
 const bigPictureCancel = bigPicture.querySelector('.big-picture__cancel');
 
-
 const docFragment = document.createDocumentFragment();
-
-//событие: добавить клик для открытия миниатюр
-function addClickOnThumbnail(picturesArray) {
-
-  const pictures = document.querySelectorAll('.picture');
-
-  for (let i = 0; i < pictures.length; i++) {
-    showBigPicture(pictures[i], picturesArray[i]);
-  }
-}
 
 //событие: открытие миниатюры
 function showBigPicture(picture, photoDesc) {
@@ -67,5 +56,5 @@ bigPictureCancel.addEventListener('click', () => {
   openCloseThumbnailPopup();
 });
 
-export { addClickOnThumbnail };
+export { showBigPicture };
 

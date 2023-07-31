@@ -21,7 +21,7 @@ document.addEventListener('keydown', (evt) => {
         //Если открыто уведомление успешной загрузки
         if (!successPopup.classList.contains('hidden')) {
           сloseSuccessPopup();
-          //Если открыта форма редактирования изображения
+          //Если открыта форма редактирования
         } else {
           showCloseUploadPopup();
         }
