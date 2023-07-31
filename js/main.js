@@ -7,6 +7,7 @@ import { sortChange, renderPictures } from './thumbnail.js';
 
 import './bigPicture.js';
 import './keydown-logic.js';
+import './users-photo.js';
 
 const RERENDER_DELAY = 500;
 
