@@ -1,5 +1,5 @@
-
-import { openCloseThumbnailPopup} from './buttons.js';
+import { openCloseThumbnailPopup } from './buttons.js';
+import { returnNumber } from './functions.js';
 
 const bigPicture = document.querySelector('.big-picture');
 const bigPicturePreview = bigPicture.querySelector('.big-picture_preview');
@@ -17,18 +17,31 @@ const bigPictureCancel = bigPicture.querySelector('.big-picture__cancel');
 
 const docFragment = document.createDocumentFragment();
 
-//событие: открытие миниатюры
-function showBigPicture(picture, photoDesc) {
-  picture.addEventListener('click', () => {
+const loadComments = (render) => {
+  commentsLoader.addEventListener('click', () => {
+    render();
+  });
+};
 
-    openCloseThumbnailPopup();
+const renderComments = (picturesArray) => {
+  const newArray = Array.from(picturesArray).slice();
+  const photoDesc = findNeededPhotoDesc(newArray);
 
-    bigPicturePreview.src = photoDesc.url;
-    likesCount.textContent = photoDesc.likes;
-    commentsCount.textContent = photoDesc.comments.length;
-    socialCaption.textContent = photoDesc.description;
+  let neededCommentsCount = returnCommentsCount();
+  neededCommentsCount += 5;
 
-    photoDesc.comments.forEach((comment) => {
+  let countForText = neededCommentsCount;
+  if (neededCommentsCount > photoDesc.comments.length){
+    countForText = photoDesc.comments.length;
+    commentsLoader.classList.add('hidden');
+  }
+
+  socialCommentCount.firstChild.textContent = `${countForText} из `;
+
+  photoDesc
+    .comments
+    .slice(0, neededCommentsCount)
+    .forEach((comment) => {
       const firstDomComment = socialComment[0];
 
       const commentElement = firstDomComment.cloneNode(true);
@@ -42,19 +55,45 @@ function showBigPicture(picture, photoDesc) {
       socialText.textContent = comment.message;
 
       docFragment.appendChild(commentElement);
-
     });
+  socialComments.innerHTML = '';
+  socialComments.appendChild(docFragment);
 
-    socialComments.appendChild(docFragment);
-    socialCommentCount.classList.add('hidden');
-    commentsLoader.classList.add('hidden');
+};
 
-  });
+function findNeededPhotoDesc(newArray) {
+  return Object.values(newArray).find(isNeededPhoto);
 }
+
+function isNeededPhoto(element) {
+  const currentId = document.querySelector('.big-picture_preview').id;
+  return element.id === returnNumber(currentId);
+}
+
+function returnCommentsCount() {
+  return returnNumber(socialCommentCount.firstChild.textContent);
+}
+
+//событие: открытие миниатюры
+const showBigPicture = (picture, photoDesc, newArray) => {
+  picture.addEventListener('click', () => {
+
+    openCloseThumbnailPopup();
+
+    bigPicturePreview.src = photoDesc.url;
+    bigPicturePreview.id = photoDesc.id;
+    likesCount.textContent = photoDesc.likes;
+    commentsCount.textContent = photoDesc.comments.length;
+    socialCaption.textContent = photoDesc.description;
+    commentsLoader.classList.remove('hidden');
+    renderComments(newArray);
+  });
+
+};
 
 bigPictureCancel.addEventListener('click', () => {
   openCloseThumbnailPopup();
 });
 
-export { showBigPicture };
+export { showBigPicture, renderComments, loadComments };
 

@@ -1,4 +1,4 @@
-import { showBigPicture } from './bigPicture.js';
+import { showBigPicture, renderComments, loadComments } from './bigPicture.js';
 import { removeChildElements, randomBoolean } from './util.js';
 
 const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
@@ -6,7 +6,6 @@ const pictureSection = document.querySelector('.pictures');
 
 const imgFilters = document.querySelector('.img-filters');
 const imgFiltersButtons = imgFilters.querySelectorAll('.img-filters__button');
-
 
 const comparePictures = (picA, picB) => {
 
@@ -45,6 +44,8 @@ const renderPictures = (picturesArray) => {
     maxCount = 10;
   }
 
+  const newArray = Array.from(picturesArray).slice();
+
   picturesArray
     .slice()
     .sort(comparePictures)
@@ -57,15 +58,16 @@ const renderPictures = (picturesArray) => {
       pictureElement.querySelector('.picture__likes').textContent = photoDesc.likes;
       pictureElement.querySelector('.picture__comments').textContent = photoDesc.comments.length;
 
-      showBigPicture(pictureElement, photoDesc);
+      showBigPicture(pictureElement, photoDesc, newArray);
       docFragment.appendChild(pictureElement);
 
     });
 
+  loadComments(()=>renderComments(picturesArray));
+
   removeChildElements(pictureSection, 'picture');
   pictureSection.appendChild(docFragment);
 };
-
 
 //смена сортировки
 function onSortChange(evt) {

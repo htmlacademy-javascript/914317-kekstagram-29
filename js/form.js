@@ -83,6 +83,8 @@ const effectLevelSlider = form.querySelector('.effect-level__slider');
 const effectLevelValue = form.querySelector('input[name="effect-level"]');
 const effectLevelContainer = form.querySelector('.img-upload__effect-level');
 
+const imgUploadSubmit = imgUpload.querySelector('button[class="img-upload__submit"]');
+
 let currentEffect;
 
 //отправка формы
@@ -91,6 +93,7 @@ const formSubmit = (onSuccess) => {
   form.addEventListener('submit', (evt) => {
 
     evt.preventDefault();
+    imgUploadSubmit.disabled = true;
     const isValid = pristine.validate();
     if (isValid) {
       const formData = new FormData(evt.target);
@@ -110,6 +113,7 @@ const formSubmit = (onSuccess) => {
         }
       })
         .catch(() => showErrorSection());
+      imgUploadSubmit.disabled = false;
     }
   });
 };

@@ -1,15 +1,36 @@
-import {сloseErrorPopup, сloseSuccessPopup} from './buttons.js';
+import { сloseErrorPopup, сloseSuccessPopup } from './buttons.js';
 
 const body = document.querySelector('body');
 const successTemplate = body.querySelector('#success').content.querySelector('.success');
 const errorTemplate = body.querySelector('#error').content.querySelector('.error');
 
-const closeSuccessSection = (evt) =>{
+const closeSuccessSection = (evt) => {
   evt.preventDefault();
   сloseSuccessPopup();
 };
 
-const showSuccessSection = () =>{
+//скрываем по клику сообщения об ошибке/успехе загрузки
+document.addEventListener('click', (evt) => {
+
+  const successPopup = body.querySelector('.success');
+  const errorPopup = body.querySelector('.error');
+
+
+  if (!successPopup.classList.contains('hidden')) {
+    if (evt.target.className !== 'success__inner' && evt.target.className !== 'success__title') {
+      successPopup.classList.add('hidden');
+    }
+  }
+
+  if (!errorPopup.classList.contains('hidden')) {
+    if (evt.target.className !== 'error__inner' && evt.target.className !== 'error__title') {
+      errorPopup.classList.add('hidden');
+    }
+  }
+}
+);
+
+const showSuccessSection = () => {
   const successPopup = body.querySelector('.success');
   successPopup.classList.toggle('hidden');
 };
@@ -27,12 +48,12 @@ const createSuccessMsgFromTemplate = () => {
   body.appendChild(docFragment);
 };
 
-const closeErrorMessage = (evt) =>{
+const closeErrorMessage = (evt) => {
   evt.preventDefault();
   сloseErrorPopup();
 };
 
-const showErrorSection = () =>{
+const showErrorSection = () => {
   const errorPopup = body.querySelector('.error');
   errorPopup.classList.toggle('hidden');
 };
