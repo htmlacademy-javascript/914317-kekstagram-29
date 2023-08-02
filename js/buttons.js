@@ -1,7 +1,7 @@
 const body = document.querySelector('body');
 const imgUploadOverlay = body.querySelector('.img-upload__overlay');
 const bigPicture = body.querySelector('.big-picture');
-
+const socialCommentCount = bigPicture.querySelector('.social__comment-count');
 
 //--->ФОРМА РЕДАКТИРОВАНИЯ ИЗОБРАЖЕНИЯ
 //показать-закрыть форму
@@ -16,6 +16,7 @@ function showCloseUploadPopup() {
 function openCloseThumbnailPopup() {
   bigPicture.classList.toggle('hidden');
   body.classList.toggle('modal-open');
+  socialCommentCount.firstChild.textContent = 0;
 }
 
 //---<
