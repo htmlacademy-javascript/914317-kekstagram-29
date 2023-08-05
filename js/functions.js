@@ -1,17 +1,15 @@
-function checkStringLength(stringForLengthCheck, maxLength) {
-  return stringForLengthCheck.length < maxLength;
-}
+const checkStringLength = (stringForLengthCheck, maxLength) => stringForLengthCheck.length < maxLength;
 
-function isPalindrome(stringForPalindromeCheck) {
+const isPalindrome = (stringForPalindromeCheck) => {
   let backString = '';
   stringForPalindromeCheck = stringForPalindromeCheck.replaceAll(' ', '').toLowerCase();
   for (let i = stringForPalindromeCheck.length - 1; i >= 0; i--) {
     backString += stringForPalindromeCheck[i];
   }
   return stringForPalindromeCheck === backString;
-}
+};
 
-function returnNumber(enterString) {
+const returnNumber = (enterString) => {
 
   let stringNumber = '';
   let currentSymbol;
@@ -25,9 +23,14 @@ function returnNumber(enterString) {
   }
 
   return stringNumber === '' ? NaN : Number(stringNumber);
-}
+};
 
-function isMeetingWithinWorkingDay(workDayStart, workDayEnd, meetingStart, meetingDuration) {
+const returnDate = (dateString) => {
+  const dateArray = dateString.split(':');
+  return new Date(1, 1, 1, parseInt(dateArray[0], 10), parseInt(dateArray[1], 10), 0);
+};
+
+const isMeetingWithinWorkingDay = (workDayStart, workDayEnd, meetingStart, meetingDuration) => {
 
   const workStartDate = returnDate(workDayStart);
   const workEndDate = returnDate(workDayEnd);
@@ -38,12 +41,7 @@ function isMeetingWithinWorkingDay(workDayStart, workDayEnd, meetingStart, meeti
 
   return meetingStartDate >= workStartDate && workEndDate >= meetingEnd;
 
-}
-
-function returnDate(dateString) {
-  const dateArray = dateString.split(':');
-  return new Date(1, 1, 1, parseInt(dateArray[0], 10), parseInt(dateArray[1], 10), 0);
-}
+};
 
 checkStringLength('kek',9);
 isPalindrome('kek');

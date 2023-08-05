@@ -6,8 +6,6 @@ const bigPicture = document.querySelector('.big-picture');
 document.addEventListener('keydown', (evt) => {
 
   if (isEscKey(evt)) {
-    const errorPopup = document.querySelector('.error');
-    const successPopup = document.querySelector('.success');
 
     //Если открыта форма просмотра миниатюры
     if (!bigPicture.classList.contains('hidden')) {
@@ -15,15 +13,17 @@ document.addEventListener('keydown', (evt) => {
       removeChildElements(bigPicture, 'social__comment');
     } else {
       //Если открыто уведомление ошибки
-      if (!errorPopup.classList.contains('hidden')) {
+      const errorPopup = document.querySelector('.error');
+      if (errorPopup !== null) {
         сloseErrorPopup();
       } else {
         //Если открыто уведомление успешной загрузки
-        if (!successPopup.classList.contains('hidden')) {
+        const successPopup = document.querySelector('.success');
+        if (successPopup !== null) {
           сloseSuccessPopup();
           //Если открыта форма редактирования
         } else {
-          showCloseUploadPopup();
+          showCloseUploadPopup(evt);
         }
       }
     }

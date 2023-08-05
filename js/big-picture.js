@@ -23,6 +23,15 @@ const loadComments = (render) => {
   });
 };
 
+const isNeededPhoto = (element) => {
+  const currentId = document.querySelector('.big-picture_preview').id;
+  return element.id === returnNumber(currentId);
+};
+
+const findNeededPhotoDesc = (newArray) => Object.values(newArray).find(isNeededPhoto);
+
+const returnCommentsCount = () => returnNumber(socialCommentCount.firstChild.textContent);
+
 const renderComments = (picturesArray) => {
   const newArray = Array.from(picturesArray).slice();
   const photoDesc = findNeededPhotoDesc(newArray);
@@ -61,19 +70,6 @@ const renderComments = (picturesArray) => {
 
 };
 
-function findNeededPhotoDesc(newArray) {
-  return Object.values(newArray).find(isNeededPhoto);
-}
-
-function isNeededPhoto(element) {
-  const currentId = document.querySelector('.big-picture_preview').id;
-  return element.id === returnNumber(currentId);
-}
-
-function returnCommentsCount() {
-  return returnNumber(socialCommentCount.firstChild.textContent);
-}
-
 //событие: открытие миниатюры
 const showBigPicture = (picture, photoDesc, newArray) => {
   picture.addEventListener('click', () => {
@@ -86,7 +82,9 @@ const showBigPicture = (picture, photoDesc, newArray) => {
     commentsCount.textContent = photoDesc.comments.length;
     socialCaption.textContent = photoDesc.description;
     commentsLoader.classList.remove('hidden');
+
     renderComments(newArray);
+
   });
 
 };
