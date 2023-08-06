@@ -100,6 +100,7 @@ const showHideEffectLevelContainer = (hide) => {
   }
 };
 
+
 const disableSubmit = () => {
   imgUploadSubmit.disabled = true;
 };
