@@ -22,7 +22,6 @@ const uploadHashtagValidation = {
   validMessage: '',
 };
 
-
 const pristine = new Pristine(form, {
   classTo: 'img-upload__text',
   errorClass: 'img-upload__text--invalid',
@@ -32,20 +31,60 @@ const pristine = new Pristine(form, {
   errorTextClass: 'img-upload__error'
 });
 
-//валидация введенного текста - точка входа
-function validateUploadtext() {
-  iSValidDescription(textarea.value);
-  iSValidHashtag(hashInput.value);
+//валидация введенного текста - валидация поля "Комментарий"
+const iSValidDescription = (value) => {
+  const isOk = checkStringLength(value, 140);
+  uploadDescriptionValidation.isValid = isOk;
+  uploadDescriptionValidation.validMessage = isOk === true ? '' : VALIDATING_MESSAGE['incorrectCommentLength'];
+};
 
-  if (uploadDescriptionValidation.isValid === true && uploadHashtagValidation.isValid === true) {
-    return true;
+//поиск дублей в хэш-тегах
+const findDuplicateValue = (array) => {
+  const findDuplicates = () => array.filter((item, index) => array.indexOf(item) !== index);
+  const duplicates = findDuplicates(array);
+  return duplicates.length > 0;
+};
+
+//валидация введенного текста - валидация поля "хэш-теги"
+const iSValidHashtag = (value) => {
+  const stringArray = value.split(' ');
+  const lowerStringArray = [];
+
+  stringArray.forEach((arrayElement) => {
+    if (arrayElement !== '') {
+      lowerStringArray.push(arrayElement.toLowerCase());
+    }
+  });
+
+  if (lowerStringArray.length === 0) {
+
+    uploadHashtagValidation.isValid = true;
+
+  } else if (lowerStringArray.length > 5 || findDuplicateValue(lowerStringArray)) {
+
+    uploadHashtagValidation.isValid = false;
+    uploadHashtagValidation.validMessage = `${VALIDATING_MESSAGE['hashCountInvalid']} или ${VALIDATING_MESSAGE['hashRepeat']}`;
+
   } else {
-    return false;
+
+    const hashTemplate = /^#[a-zа-яё0-9]{1,19}$/i;
+    let isOk;
+
+    for (let i = 0; i < lowerStringArray.length; i++) {
+      isOk = hashTemplate.test(lowerStringArray[i]);
+      if (!isOk) {
+        break;
+      }
+    }
+    uploadHashtagValidation.isValid = isOk;
+    uploadHashtagValidation.validMessage = isOk === true ? '' : VALIDATING_MESSAGE['hashInvalid'];
+
   }
-}
+};
+
 
 //валидация введенного текста - сообщение пользователю
-function getValidateMessage() {
+const getValidateMessage = () => {
 
   let errorString = '';
   if (uploadDescriptionValidation.isValid === false) {
@@ -61,51 +100,28 @@ function getValidateMessage() {
   }
   return errorString;
 
-}
+};
 
-//валидация введенного текста - валидация поля "Комментарий"
-function iSValidDescription(value) {
-  const isOk = checkStringLength(value, 10);
-  uploadDescriptionValidation.isValid = isOk;
-  uploadDescriptionValidation.validMessage = isOk === true ? '' : VALIDATING_MESSAGE['incorrectCommentLength'];
-}
+//валидация введенного текста - точка входа
+const validateUploadtext = () => {
+  iSValidDescription(textarea.value);
+  iSValidHashtag(hashInput.value);
 
-//валидация введенного текста - валидация поля "хэш-теги"
-function iSValidHashtag(value) {
-  const stringArray = value.split(' ');
-
-  if (stringArray.length === 1 && stringArray[0] === '') {
-
-    uploadHashtagValidation.isValid = true;
-
-  } else if (stringArray.length > 5 || findDuplicateValue(stringArray)) {
-
-    uploadHashtagValidation.isValid = false;
-    uploadHashtagValidation.validMessage = `${VALIDATING_MESSAGE['hashCountInvalid']} или ${VALIDATING_MESSAGE['hashRepeat']}`;
-
+  if (uploadDescriptionValidation.isValid === true && uploadHashtagValidation.isValid === true) {
+    return true;
   } else {
-
-    const hashTemplate = /^#[a-zа-яё0-9]{1,19}$/i;
-    let isOk;
-
-    for (let i = 0; i < stringArray.length; i++) {
-      isOk = hashTemplate.test(stringArray[i]);
-      if (!isOk) {
-        break;
-      }
-    }
-    uploadHashtagValidation.isValid = isOk;
-    uploadHashtagValidation.validMessage = isOk === true ? '' : VALIDATING_MESSAGE['hashInvalid'];
-
+    return false;
   }
-}
+};
 
-//поиск дублей в хэш-тегах
-function findDuplicateValue(array) {
-  const findDuplicates = () => array.filter((item, index) => array.indexOf(item) !== index);
-  const duplicates = findDuplicates(array);
-  return duplicates.length > 0;
-}
+const onChange = () => {
+  if (pristine.validate()){
+    pristine.reset();
+  }
+};
+
+hashInput.addEventListener('change', onChange);
+textarea.addEventListener('input', onChange);
 
 pristine.addValidator(hashInput, validateUploadtext, getValidateMessage);
 pristine.addValidator(textarea, validateUploadtext, getValidateMessage);

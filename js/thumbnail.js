@@ -1,5 +1,5 @@
-import { showBigPicture, renderComments, loadComments } from './bigPicture.js';
-import { removeChildElements, randomBoolean } from './util.js';
+import { showBigPicture, renderComments, loadComments } from './big-picture.js';
+import { removeChildElements, getRandomBoolean } from './util.js';
 
 const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
 const pictureSection = document.querySelector('.pictures');
@@ -21,7 +21,7 @@ const comparePictures = (picA, picB) => {
     return 0;
 
   } else if (filter === 'filter-random') {
-    return randomBoolean === true ? 1 : -1;
+    return getRandomBoolean === true ? 1 : -1;
 
   } else {
     return 0;
@@ -33,9 +33,6 @@ const comparePictures = (picA, picB) => {
 const renderPictures = (picturesArray) => {
 
   const docFragment = document.createDocumentFragment();
-  if (imgFilters.classList.contains('img-filters--inactive')) {
-    imgFilters.classList.remove('img-filters--inactive');
-  }
 
   const filter = document.querySelector('.img-filters__button.img-filters__button--active').id;
 
@@ -53,8 +50,9 @@ const renderPictures = (picturesArray) => {
     .forEach((photoDesc) => {
 
       const pictureElement = pictureTemplate.cloneNode(true);
-      pictureElement.querySelector('.picture__img').src = photoDesc.url;
-      pictureElement.querySelector('.picture__img').alt = photoDesc.description;
+      const pictureProperty = pictureElement.querySelector('.picture__img');
+      pictureProperty.src = photoDesc.url;
+      pictureProperty.alt = photoDesc.description;
       pictureElement.querySelector('.picture__likes').textContent = photoDesc.likes;
       pictureElement.querySelector('.picture__comments').textContent = photoDesc.comments.length;
 
@@ -69,8 +67,14 @@ const renderPictures = (picturesArray) => {
   pictureSection.appendChild(docFragment);
 };
 
+const showFilterSection = () => {
+  if (imgFilters.classList.contains('img-filters--inactive')) {
+    imgFilters.classList.remove('img-filters--inactive');
+  }
+};
+
 //смена сортировки
-function onSortChange(evt) {
+const onSortChange = (evt) => {
 
   if (evt.target.matches('button[class^="img-filters__button"]')) {
     imgFiltersButtons.forEach((button) => {
@@ -81,7 +85,7 @@ function onSortChange(evt) {
       }
     });
   }
-}
+};
 
 //событие: #смена фильтра
 const sortChange = (render) => {
@@ -94,4 +98,4 @@ const sortChange = (render) => {
   });
 };
 
-export { renderPictures, sortChange };
+export { renderPictures, showFilterSection, sortChange };

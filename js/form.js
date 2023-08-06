@@ -1,10 +1,11 @@
 import { returnNumber } from './functions.js';
 import { pristine } from './validation.js';
 import { showCloseUploadPopup } from './buttons.js';
-import { showErrorSection, showSuccessSection } from './templates.js';
+import { createSuccessMsgFromTemplate, createErrorMsgFromTemplate } from './templates.js';
 
 const MAX_SCALE_VALUE = 100;
 const MIN_SCALE_VALUE = 25;
+const SCALE_STEP_VALUE = 25;
 
 const EFFECTS_OPTIONS = {
   'chrome': 'grayscale',
@@ -87,6 +88,42 @@ const imgUploadSubmit = imgUpload.querySelector('button[class="img-upload__submi
 
 let currentEffect;
 
+//показать-скрыть слайдер и его контейнер
+const showHideEffectLevelContainer = (hide) => {
+  if (hide) {
+    effectLevelSlider.classList.add('hidden');
+    effectLevelContainer.classList.add('hidden');
+
+  } else if (effectLevelSlider.classList.contains('hidden')) {
+    effectLevelSlider.classList.remove('hidden');
+    effectLevelContainer.classList.remove('hidden');
+  }
+};
+
+const disableSubmit = () => {
+  imgUploadSubmit.disabled = true;
+};
+
+const ableSubmit = () => {
+  imgUploadSubmit.disabled = false;
+};
+
+//сбросить форму к изначальному состоянию
+const resetForm = () => {
+
+  effectLevelSlider.noUiSlider.updateOptions(SLIDER_STYLE_OPTIONS['none']);
+  imgPreview.style.removeProperty('filter');
+  effectLevelValue.value = 0;
+  showHideEffectLevelContainer(true);
+
+  form.reset();
+  pristine.validate();
+  pristine.reset();
+
+  ableSubmit();
+
+};
+
 //отправка формы
 const formSubmit = (onSuccess) => {
 
@@ -96,6 +133,8 @@ const formSubmit = (onSuccess) => {
     imgUploadSubmit.disabled = true;
     const isValid = pristine.validate();
     if (isValid) {
+      disableSubmit();
+      pristine.reset();
       const formData = new FormData(evt.target);
       fetch('https://29.javascript.pages.academy/kekstagram',
         {
@@ -105,36 +144,25 @@ const formSubmit = (onSuccess) => {
 
       ).then((response) =>{
         if (response.ok){
-          onSuccess();
-          showSuccessSection();
+          ableSubmit();
+          onSuccess(evt);
+          createSuccessMsgFromTemplate();
           resetForm();
         } else{
-          showErrorSection();
+          ableSubmit();
+          createErrorMsgFromTemplate();
         }
       })
-        .catch(() => showErrorSection());
-      imgUploadSubmit.disabled = false;
+        .catch(() => createErrorMsgFromTemplate());
     }
   });
 };
 
-
 noUiSlider.create(effectLevelSlider, SLIDER_STYLE_OPTIONS['none']);
 
-//показать-скрыть слайдер и его контейнер
-function showHideEffectLevelContainer(hide) {
-  if (hide) {
-    effectLevelSlider.classList.add('hidden');
-    effectLevelContainer.classList.add('hidden');
-
-  } else if (effectLevelSlider.classList.contains('hidden')) {
-    effectLevelSlider.classList.remove('hidden');
-    effectLevelContainer.classList.remove('hidden');
-  }
-}
 
 //#смена фильтра
-function onEffectChange(evt) {
+const onEffectChange = (evt) => {
   if (evt.target.matches('input[type="radio"]')) {
     if (evt.target.checked) {
       currentEffect = evt.target.value;
@@ -150,7 +178,7 @@ function onEffectChange(evt) {
       }
     }
   }
-}
+};
 
 //событие: #смена фильтра
 form.addEventListener('change', onEffectChange);
@@ -176,8 +204,8 @@ effectLevelSlider.noUiSlider.on('update', () => {
 imgUploadInput.addEventListener('change', showCloseUploadPopup);
 
 //событие: закрытие формы редактирования изображения по "крестику"
-imgUploadCancel.addEventListener('click', () => {
-  showCloseUploadPopup();
+imgUploadCancel.addEventListener('click', (evt) => {
+  showCloseUploadPopup(evt);
   resetForm();
 });
 
@@ -186,7 +214,7 @@ scaleControlSmaller.addEventListener('click', () => {
   let currValue = returnNumber(inputScale.value);
 
   if (currValue > MIN_SCALE_VALUE) {
-    currValue = currValue - 25;
+    currValue = currValue - SCALE_STEP_VALUE;
   }
 
   inputScale.value = `${currValue}%`;
@@ -199,25 +227,12 @@ scaleControlBigger.addEventListener('click', () => {
   let currValue = returnNumber(inputScale.value);
 
   if (currValue < MAX_SCALE_VALUE) {
-    currValue = currValue + 25;
+    currValue = currValue + SCALE_STEP_VALUE;
   }
 
   inputScale.value = `${currValue}%`;
   const scaleTransform = currValue / 100;
   imgPreview.style.transform = `scale(${scaleTransform})`;
 });
-
-//сбросить форму к изначальному состоянию
-function resetForm() {
-
-  effectLevelSlider.noUiSlider.updateOptions(SLIDER_STYLE_OPTIONS['none']);
-  imgPreview.style.removeProperty('filter');
-  effectLevelValue.value = 0;
-  showHideEffectLevelContainer(true);
-
-  form.reset();
-  pristine.validate();
-
-}
 
 export { formSubmit, resetForm };

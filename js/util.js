@@ -3,7 +3,7 @@ const ALERT_SHOW_TIME = 5000;
 
 const isEscKey = (evt) => evt.key === 'Escape';
 
-const randomBoolean = () => Math.random() < 0.5;
+const getRandomBoolean = () => Math.random() < 0.5;
 
 const showAlert = (message) => {
 
@@ -27,7 +27,7 @@ const showAlert = (message) => {
   }, ALERT_SHOW_TIME);
 };
 
-function getRandomNumber(min, max) {
+const getRandomNumber = (min, max) => {
 
   const lowValue = Math.ceil(Math.min(Math.abs(min), Math.abs(max)));
   const maxValue = Math.floor(Math.max(Math.abs(min), Math.abs(max)));
@@ -36,9 +36,9 @@ function getRandomNumber(min, max) {
 
   return Math.floor(result);
 
-}
+};
 
-function createId(min, max) {
+const createId = (min, max) => {
 
   const previousValues = [];
 
@@ -54,9 +54,9 @@ function createId(min, max) {
     return idNumber;
 
   };
-}
+};
 
-function removeChildElements(parentElement, className = '', fullName = '') {
+const removeChildElements = (parentElement, className = '', fullName = '') => {
 
   if (fullName === '') {
     const allObjects = parentElement.querySelectorAll(`.${className}`);
@@ -72,9 +72,11 @@ function removeChildElements(parentElement, className = '', fullName = '') {
     );
   }
 
-}
+};
 
-const debounce = (callback, timeoutDelay) => {
+//переименовал debounce на postponeExecution по просьбе предыдущего проверяющего.
+//комментарий: Имя функции «debounce» не начинается с глагола Файл: js/util.js, строка 77, позиция 7.
+const postponeExecution = (callback, timeoutDelay) => {
   let timeoutId;
   return (...rest) => {
     clearTimeout(timeoutId);
@@ -87,6 +89,6 @@ export {
   , isEscKey
   , showAlert
   , removeChildElements
-  , randomBoolean
-  , debounce
+  , getRandomBoolean
+  , postponeExecution
 };
