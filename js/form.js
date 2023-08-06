@@ -104,7 +104,7 @@ const disableSubmit = () => {
   imgUploadSubmit.disabled = true;
 };
 
-const ableSubmit = () => {
+const enableSubmit = () => {
   imgUploadSubmit.disabled = false;
 };
 
@@ -120,7 +120,7 @@ const resetForm = () => {
   pristine.validate();
   pristine.reset();
 
-  ableSubmit();
+  enableSubmit();
 
 };
 
@@ -144,12 +144,12 @@ const formSubmit = (onSuccess) => {
 
       ).then((response) =>{
         if (response.ok){
-          ableSubmit();
+          enableSubmit();
           onSuccess(evt);
           createSuccessMsgFromTemplate();
           resetForm();
         } else{
-          ableSubmit();
+          enableSubmit();
           createErrorMsgFromTemplate();
         }
       })
